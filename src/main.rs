@@ -181,6 +181,19 @@ fn get_destination_to_binary_map() -> HashMap<String, String> {
     return destination_to_binary;
 }
 
+fn get_jump_type_to_binary_map() -> HashMap<String, String> {
+    let mut jump_type_to_binary = HashMap::new();
+    jump_type_to_binary.insert(String::from(""), String::from("000"));
+    jump_type_to_binary.insert(String::from("JGT"), String::from("001"));
+    jump_type_to_binary.insert(String::from("JEQ"), String::from("010"));
+    jump_type_to_binary.insert(String::from("JGE"), String::from("011"));
+    jump_type_to_binary.insert(String::from("JLT"), String::from("100"));
+    jump_type_to_binary.insert(String::from("JNE"), String::from("101"));
+    jump_type_to_binary.insert(String::from("JLE"), String::from("110"));
+    jump_type_to_binary.insert(String::from("JMP"), String::from("111"));
+    return jump_type_to_binary;
+}
+
 fn get_compuation_to_binary_map() -> HashMap<String, String> {
     let mut computation_to_binary = HashMap::new();
     computation_to_binary.insert(String::from("0"), String::from("0101010"));
