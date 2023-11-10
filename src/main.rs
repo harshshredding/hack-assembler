@@ -2,6 +2,12 @@ use std::io::{BufRead, self};
 use std::fs::File;
 use std::path::Path;
 
+#[derive(Debug, PartialEq)]
+enum Instruction {
+    Ainstruction {address: String},
+    Cinstruction {destination: String, computation: String, jump_type: String}
+}
+
 fn main() {
     let lines = read_all_lines_from_file("Max.asm");
     for line in lines.iter() {
@@ -28,6 +34,55 @@ fn main() {
         println!("{}", line);
     }
 
+
+    println!("\n\nAll Instructions");
+    let lines = remove_all_empty_lines(&lines);
+    for line in lines.iter() {
+        println!("{}", line);
+    }
+
+}
+
+fn get_instruction(assembly_string: &str) -> Instruction {
+    assert!(assembly_string.len() > 0, "Empty strings cannot be converted into instructions");
+    let first_character = assembly_string.get(0..1).unwrap();
+    if first_character == "@" { // A instruction 
+        let address = assembly_string.get(1..)
+                        .expect("trouble getting the address part of A instruction");
+        let address = address.to_string();
+        return Instruction::Ainstruction { address };
+    } else { // C instruction
+        let destination = match assembly_string.find("=") {
+            None => "".to_string(),
+            Some(index) => {
+                assembly_string.get(..index).expect("trouble getting everything before =").to_string()
+            }
+        };
+
+        let mut computation_begin_idx = destination.len();
+        if !destination.is_empty() {
+            computation_begin_idx += 1;
+        }
+
+        let computation = match assembly_string.find(";") {
+            None => assembly_string.get(computation_begin_idx..)
+                        .expect("trouble getting computation without jump")
+                        .to_string(),
+            Some(index) => assembly_string.get(computation_begin_idx..index)
+                            .expect("trouble getting computation without jump")
+                            .to_string() 
+        };
+        assert!(!computation.is_empty(), "computation can never be empty: assembly = {}", assembly_string);
+
+        let jump_type = match assembly_string.find(";") {
+            None => "".to_string(),
+            Some(index) => assembly_string.get((index+1)..)
+                            .expect(&format!("trouble getting jump type, assembly {}", assembly_string))
+                            .to_string()  
+        };
+
+        return Instruction::Cinstruction { destination, computation, jump_type}
+    }
 }
 
 fn remove_all_empty_lines(lines: &Vec<String>) -> Vec<String> {
@@ -117,5 +172,23 @@ mod tests {
         let expected = vec!["abc".to_string(), "abc".to_string()];
         let result = remove_all_empty_lines(&lines);
         assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn test_get_instruction() {
+        let instruction = get_instruction("@1234");
+        assert_eq!(instruction, Instruction::Ainstruction { address: "1234".into() });
+
+        
+        let instruction = get_instruction("D=A+D;JMP");
+        assert_eq!(instruction, Instruction::Cinstruction { destination: "D".into(), computation: "A+D".into(), jump_type: "JMP".into()});
+
+
+        let instruction = get_instruction("D=A+D");
+        assert_eq!(instruction, Instruction::Cinstruction { destination: "D".into(), computation: "A+D".into(), jump_type: "".into()});
+
+
+        let instruction = get_instruction("0;JMP");
+        assert_eq!(instruction, Instruction::Cinstruction { destination: "".into(), computation: "0".into(), jump_type: "JMP".into()});
     }
 }
