@@ -203,16 +203,16 @@ fn get_compuation_to_binary_map() -> HashMap<String, String> {
     computation_to_binary.insert(String::from("D|A"), String::from("0010101"));
 
 
-    computation_to_binary.insert(String::from("M"), String::from("110000"));
-    computation_to_binary.insert(String::from("!M"), String::from("110001"));
-    computation_to_binary.insert(String::from("-M"), String::from("110011"));
-    computation_to_binary.insert(String::from("M+1"), String::from("110111"));
-    computation_to_binary.insert(String::from("M-1"), String::from("110010"));
-    computation_to_binary.insert(String::from("D+M"), String::from("000010"));
-    computation_to_binary.insert(String::from("D-M"), String::from("010011"));
-    computation_to_binary.insert(String::from("M-D"), String::from("000111"));
-    computation_to_binary.insert(String::from("D&M"), String::from("000000"));
-    computation_to_binary.insert(String::from("D|M"), String::from("010101"));
+    computation_to_binary.insert(String::from("M"), String::from("1110000"));
+    computation_to_binary.insert(String::from("!M"), String::from("1110001"));
+    computation_to_binary.insert(String::from("-M"), String::from("1110011"));
+    computation_to_binary.insert(String::from("M+1"), String::from("1110111"));
+    computation_to_binary.insert(String::from("M-1"), String::from("1110010"));
+    computation_to_binary.insert(String::from("D+M"), String::from("1000010"));
+    computation_to_binary.insert(String::from("D-M"), String::from("1010011"));
+    computation_to_binary.insert(String::from("M-D"), String::from("1000111"));
+    computation_to_binary.insert(String::from("D&M"), String::from("1000000"));
+    computation_to_binary.insert(String::from("D|M"), String::from("1010101"));
 
     return computation_to_binary;
 }
