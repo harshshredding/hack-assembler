@@ -1,6 +1,7 @@
 use std::io::{BufRead, self};
 use std::fs::File;
 use std::path::Path;
+use std::collections::HashMap; 
 
 #[derive(Debug, PartialEq)]
 enum Instruction {
@@ -107,7 +108,9 @@ fn instruction_to_binary(instruction: Instruction) -> String {
         Instruction::Ainstruction{address} => {
             address_to_binary(&address)
         },
-        Instruction::Cinstruction { destination, computation, jump_type } => "".into(),
+        Instruction::Cinstruction { destination, computation, jump_type } =>  {
+
+        }
     }
 }
 
@@ -163,6 +166,42 @@ fn remove_comment(some_string: &str) -> String {
             string_before_comment
         }
     }
+}
+
+fn get_destination_to_binary_map() -> HashMap<String, String> {
+    let mut destination_to_binary = HashMap::new();
+    destination_to_binary.insert(String::from(""), String::from("000"));
+    destination_to_binary.insert(String::from("M"), String::from("001"));
+    destination_to_binary.insert(String::from("D"), String::from("010"));
+    destination_to_binary.insert(String::from("MD"), String::from("011"));
+    destination_to_binary.insert(String::from("A"), String::from("100"));
+    destination_to_binary.insert(String::from("AM"), String::from("101"));
+    destination_to_binary.insert(String::from("AD"), String::from("110"));
+    destination_to_binary.insert(String::from("AMD"), String::from("111"));
+    return destination_to_binary;
+}
+
+fn get_compuation_to_binary_map() -> HashMap<String, String> {
+    let mut computation_to_binary = HashMap::new();
+    computation_to_binary.insert(String::from(""), String::from("101010"));
+    computation_to_binary.insert(String::from(""), String::from("111111"));
+    computation_to_binary.insert(String::from(""), String::from("111010"));
+    computation_to_binary.insert(String::from(""), String::from("001100"));
+    computation_to_binary.insert(String::from(""), String::from("110000"));
+    computation_to_binary.insert(String::from(""), String::from("001101"));
+    computation_to_binary.insert(String::from(""), String::from("110001"));
+    computation_to_binary.insert(String::from(""), String::from("001111"));
+    computation_to_binary.insert(String::from(""), String::from("110011"));
+    computation_to_binary.insert(String::from(""), String::from("011111"));
+    computation_to_binary.insert(String::from(""), String::from("110111"));
+    computation_to_binary.insert(String::from(""), String::from("001110"));
+    computation_to_binary.insert(String::from(""), String::from("110010"));
+    computation_to_binary.insert(String::from(""), String::from("000010"));
+    computation_to_binary.insert(String::from(""), String::from("010011"));
+    computation_to_binary.insert(String::from(""), String::from("000111"));
+    computation_to_binary.insert(String::from(""), String::from("000000"));
+    computation_to_binary.insert(String::from(""), String::from("010101"));
+    return computation_to_binary;
 }
 
 #[cfg(test)]
@@ -225,6 +264,12 @@ mod tests {
     #[test]
     fn test_address_to_binary() {
         assert_eq!("0000000000001000", address_to_binary("8"));
+    }
+
+    #[test]
+    fn test_instruction_to_binary() {
+        let result = instruction_to_binary(Instruction::Ainstruction { address: "8".into() });
+        assert_eq!("0000000000001000", result);
     }
 
 }
