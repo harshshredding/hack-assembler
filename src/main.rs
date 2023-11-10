@@ -80,7 +80,34 @@ fn get_instruction(assembly_string: &str) -> Instruction {
                             .to_string()  
         };
 
-        return Instruction::Cinstruction { destination, computation, jump_type}
+        return Instruction::Cinstruction { destination, computation, jump_type }
+    }
+}
+
+fn address_to_binary(address_string: &str) -> String {
+    let parsed_integer = address_string.parse::<u16>()
+                                .expect(&format!("Could not parse address {} into a 16 bit integer", address_string));
+    let binary_string = format!("{:16b}", parsed_integer);
+    let binary_string: String = binary_string.chars().into_iter()
+                    .map(|char| {
+                        if char == ' ' {
+                            '0'
+                        } else {
+                            char
+                        }
+                    }).collect();
+    assert_eq!(binary_string.len(), 16);
+    let most_significant_bit = binary_string.get(0..1).unwrap();
+    assert_eq!(most_significant_bit, "0");
+    binary_string
+}
+
+fn instruction_to_binary(instruction: Instruction) -> String {
+    match instruction {
+        Instruction::Ainstruction{address} => {
+            address_to_binary(&address)
+        },
+        Instruction::Cinstruction { destination, computation, jump_type } => "".into(),
     }
 }
 
@@ -194,4 +221,10 @@ mod tests {
         let instruction = get_instruction("0;JMP");
         assert_eq!(instruction, Instruction::Cinstruction { destination: "".into(), computation: "0".into(), jump_type: "JMP".into()});
     }
+
+    #[test]
+    fn test_address_to_binary() {
+        assert_eq!("0000000000001000", address_to_binary("8"));
+    }
+
 }
