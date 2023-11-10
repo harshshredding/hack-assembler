@@ -27,22 +27,21 @@ fn main() {
         println!("{}", line);
     }
 
-
     println!("\n\nRemove All Empty Lines:");
     let lines = remove_all_empty_lines(&lines);
     for line in lines.iter() {
         println!("{}", line);
     }
 
-
     println!("\n\nAll Instructions");
-    let lines = remove_all_empty_lines(&lines);
-    for line in lines.iter() {
-        println!("{}", line);
+    let instructions = get_instructions_from_lines(&lines);
+    for instruction in instructions.iter() {
+        println!("{:?}", instruction);
     }
-
 }
 
+// Converts line(text) of assembly to an Instruction, which will
+// later be used to create binary code.
 fn get_instruction(assembly_string: &str) -> Instruction {
     assert!(assembly_string.len() > 0, "Empty strings cannot be converted into instructions");
     let first_character = assembly_string.get(0..1).unwrap();
@@ -90,6 +89,10 @@ fn remove_all_empty_lines(lines: &Vec<String>) -> Vec<String> {
                         !line.is_empty())
                         .cloned()
                         .collect()
+}
+
+fn get_instructions_from_lines(lines: &Vec<String>) -> Vec<Instruction> {
+    lines.iter().map(|s| get_instruction(s)).collect()
 }
 
 fn read_trimmed_lines_from_file(file_name: &str) -> Vec<String> {
