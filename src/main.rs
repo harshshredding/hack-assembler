@@ -1,4 +1,4 @@
-use std::io::{BufRead, self};
+use std::io::{BufRead, self, Write};
 use std::fs::File;
 use std::path::Path;
 use std::collections::HashMap; 
@@ -10,14 +10,9 @@ enum Instruction {
 }
 
 fn main() {
-    let lines = read_all_lines_from_file("Max.asm");
-    for line in lines.iter() {
-        println!("{}", line);
-    }
-
-    println!("\n\nTrimmed:");
-
-    let lines = read_trimmed_lines_from_file("Max.asm");
+    let input_file_name = "MaxL";
+    let input_file_path = format!("{}.asm", input_file_name);
+    let lines = read_trimmed_lines_from_file(&input_file_path);
     for line in lines.iter() {
         println!("{}", line);
     }
@@ -39,6 +34,31 @@ fn main() {
     for instruction in instructions.iter() {
         println!("{:?}", instruction);
     }
+
+    println!("\n\nAll Instructions");
+    let binary_instructions = get_binary_instructions(instructions);
+    for instruction in binary_instructions.iter() {
+        println!("{}", instruction);
+    }
+
+    let output_file_path = format!("{}.hack", input_file_name);
+    let mut output_binary_file = File::create(output_file_path)
+                                .expect("Could not create output binaryfile.");
+
+    for binary_instruction in binary_instructions {
+        writeln!(output_binary_file, "{}", binary_instruction)
+            .expect(&format!("Could not write binary instruction {} to file", binary_instruction));
+    }
+}
+
+fn get_binary_instructions(instructions: Vec<Instruction>) -> Vec<String>{
+    let jump_dict = get_jump_type_to_binary_map();
+    let computation_dict = get_compuation_to_binary_map();
+    let destination_dict = get_destination_to_binary_map();
+    instructions.into_iter().map(
+                                |instr| 
+                                instruction_to_binary(instr, &destination_dict, &computation_dict, &jump_dict))
+                            .collect()
 }
 
 // Converts line(text) of assembly to an Instruction, which will
@@ -103,15 +123,29 @@ fn address_to_binary(address_string: &str) -> String {
     binary_string
 }
 
-fn instruction_to_binary(instruction: Instruction) -> String {
+fn instruction_to_binary(instruction: Instruction, 
+                         destination_to_binary: &HashMap<String,String>, 
+                         computation_to_binary: &HashMap<String,String>, 
+                         jump_type_to_binary: &HashMap<String,String>, 
+                         ) -> String {
     match instruction {
         Instruction::Ainstruction{address} => {
             address_to_binary(&address)
         },
         Instruction::Cinstruction { destination, computation, jump_type } =>  {
-
+            let destination_binary_string = destination_to_binary.get(&destination)
+                                        .expect(&format!("destination not supported {}", destination)).to_owned();
+            let jump_binary_string = jump_type_to_binary.get(&jump_type)
+                                        .expect(&format!("jump not supported {}", jump_type)).to_owned();
+            let computation_binary_string = computation_to_binary.get(&computation)
+                                        .expect(&format!("destination not supported {}", computation)).to_owned();
+            return format!("111{}{}{}", computation_binary_string, destination_binary_string, jump_binary_string);
         }
     }
+}
+
+fn get_binary_from_c_instruction(destination: &String, computation: &String, jump_type: &String) {
+
 }
 
 fn remove_all_empty_lines(lines: &Vec<String>) -> Vec<String> {
@@ -294,8 +328,16 @@ mod tests {
 
     #[test]
     fn test_instruction_to_binary() {
-        let result = instruction_to_binary(Instruction::Ainstruction { address: "8".into() });
+        let jump_dict = get_jump_type_to_binary_map();
+        let computation_dict = get_compuation_to_binary_map();
+        let destination_dict = get_destination_to_binary_map();
+
+        let result = instruction_to_binary(Instruction::Ainstruction { address: "8".into() }, &destination_dict, &computation_dict, &jump_dict);
         assert_eq!("0000000000001000", result);
+
+
+        let result = instruction_to_binary(Instruction::Cinstruction { destination: "D".into(), computation: "D+A".into(), jump_type: "JMP".into() }, &destination_dict, &computation_dict, &jump_dict);
+        assert_eq!("1110000010010111", result);
     }
 
 }
