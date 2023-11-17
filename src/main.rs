@@ -10,7 +10,7 @@ enum Instruction {
 }
 
 fn main() {
-    let input_file_name = "MaxL";
+    let input_file_name = "PongL";
     let input_file_path = format!("{}.asm", input_file_name);
     let lines = read_trimmed_lines_from_file(&input_file_path);
     for line in lines.iter() {
@@ -29,13 +29,13 @@ fn main() {
         println!("{}", line);
     }
 
-    println!("\n\nAll Instructions");
+    println!("\n\nGet Instructions");
     let instructions = get_instructions_from_lines(&lines);
     for instruction in instructions.iter() {
         println!("{:?}", instruction);
     }
 
-    println!("\n\nAll Instructions");
+    println!("\n\n Get Binary");
     let binary_instructions = get_binary_instructions(instructions);
     for instruction in binary_instructions.iter() {
         println!("{}", instruction);
